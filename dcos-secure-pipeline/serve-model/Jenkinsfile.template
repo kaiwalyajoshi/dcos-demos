@@ -13,25 +13,9 @@ def gitCommit() {
         dir ('.') {
         // Build Docker image
         stage 'Build'
-        sh "docker build -t ${REGISTRYHOSTNAME}.marathon.l4lb.thisdcos.directory:5000/serve-model ."
+        sh "docker build -t test-build:latest ."
 
         stage 'Test'
         sh "ls"
-
-
-        // Push image to GitLab
-        stage 'Publish'
-        sh "docker push ${REGISTRYHOSTNAME}.marathon.l4lb.thisdcos.directory:5000/serve-model"
     }
-
-    // Deploy
-    stage 'Deploy'
-        sh "if [ ! -f ./kubectl ]; then wget -q https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/linux/amd64/kubectl; fi"
-        sh "chmod +x ./kubectl"
-        sh "./kubectl config set-credentials jenkins --token=${JENKINSK8STOKEN}"
-        sh "./kubectl config set-cluster dcos-k8s --server=https://apiserver.${K8SHOSTNAME}.l4lb.thisdcos.directory:6443 --insecure-skip-tls-verify"
-        sh "./kubectl config set-context dcos-k8s --cluster=dcos-k8s --namespace=default --user=jenkins"
-        sh "./kubectl config use-context dcos-k8s"
-        sh "./kubectl get pods"
-        sh "./kubectl apply --force -f serve-model.yaml"
     }
